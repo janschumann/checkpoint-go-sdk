@@ -1,9 +1,8 @@
 package client
 
 import (
-	"os"
 	"github.com/janschumann/checkpoint-go-sdk/checkpoint/credentials"
-	"github.com/janschumann/checkpoint-go-sdk/checkpoint/defaults"
+	"os"
 )
 
 // EnvProviderName provides a name of the provider when config is loaded from environment.
@@ -19,9 +18,9 @@ type envConfig struct {
 	// variables, shared credential file, and EC2 Instance Roles.
 	Credentials credentials.Value
 
-	ApiScheme string
-	ApiHost string
-	ApiPort int
+	ApiScheme  string
+	ApiHost    string
+	ApiPort    int
 	ApiContext string
 	ApiVersion string
 
@@ -39,7 +38,6 @@ var (
 	credPasswordEnvKey = []string{
 		"CHECKPOINT_PASSWORD",
 	}
-)
 )
 
 // loadEnvConfig retrieves the SDK's environment configuration.

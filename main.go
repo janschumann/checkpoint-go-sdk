@@ -1,37 +1,29 @@
 package main
 
 import (
-	"github.com/aws/aws-sdk-go/aws/session"
+	"fmt"
 	"github.com/janschumann/checkpoint-go-sdk/checkpoint"
 	"github.com/janschumann/checkpoint-go-sdk/checkpoint/client"
 	"github.com/janschumann/checkpoint-go-sdk/checkpoint/credentials"
+	"github.com/janschumann/checkpoint-go-sdk/service/host"
+	"github.com/janschumann/checkpoint-go-sdk/service/session"
 )
 
 func main() {
 
-	client := client.New(checkpoint.NewConfig().
-		WithCredentials(credentials.NewStaticCredentials("admin", "dkPL.N5zqAJKad7yFoZAN(Pm", "")).
+	c := client.New(checkpoint.NewConfig().
+		WithCredentials(credentials.NewStaticCredentials("admin", "dkPL.N5zqAJKad7yFoZAN(Pm")).
 		WithApiHost("management-wbo7vw5btkaac.westeurope.cloudapp.azure.com").
 		WithDisableSSL(true))
 
-	h := host.New(sess)
+	h := host.New(c)
 	_, _, err := h.AddHost(&host.AddHostInput{
-		Name: "foo",
+		Name:       "foo",
 		Ip4Address: "192.168.20.10",
 	})
 
-	sess.Auth()
+	s := session.New(c)
+	pr, pe, err := s.Publish()
 
-	h = host.New(sess)
-	_, _, err = h.AddHost(&host.AddHostInput{
-		Name: "bar",
-		Ip4Address: "192.168.20.11",
-	})
-
-	sess.Auth()
-
-	svc := session.New(sess)
-	pr, pe, err := svc.Publish()
-
-	fmt.Sprintf("%v ... %v ... %v", pr, pe, err)
+	fmt.Printf("%v ... %v ... %v", pr, pe, err)
 }

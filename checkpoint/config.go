@@ -21,16 +21,16 @@ type Config struct {
 	// `http.DefaultClient`. @see defaults package
 	HTTPClient *http.Client
 
-	ApiScheme *string
-	ApiHost *string
-	ApiPort *int
+	ApiScheme  *string
+	ApiHost    *string
+	ApiPort    *int
 	ApiContext *string
 	ApiVersion *string
 
-	FingerprintFile *string
+	FingerprintFile  *string
 	CheckFingerprint *bool
 
-	Proxy   *string
+	Proxy *string
 
 	// Set this to `true` to disable SSL when sending requests. Defaults
 	// to `false`.

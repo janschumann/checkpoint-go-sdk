@@ -20,7 +20,7 @@ type StaticProvider struct {
 
 // NewStaticCredentials returns a pointer to a new Credentials object
 // wrapping a static credentials value provider.
-func NewStaticCredentials(user, password, token string) *Credentials {
+func NewStaticCredentials(user, password string) *Credentials {
 	return NewCredentials(&StaticProvider{Value: Value{
 		User:     user,
 		Password: password,

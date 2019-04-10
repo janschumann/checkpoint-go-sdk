@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"github.com/dghubble/sling"
 	"github.com/janschumann/checkpoint-go-sdk/checkpoint"
@@ -16,10 +17,10 @@ import (
 	"net/url"
 	"os"
 	"time"
-	)
+)
 
 type Session struct {
-	Config   *checkpoint.Config
+	Config     *checkpoint.Config
 	HTTPClient *sling.Sling
 }
 
@@ -52,7 +53,7 @@ func NewSession(cfgs ...*checkpoint.Config) (*Session, error) {
 	}
 
 	s := &Session{
-		Config:   cfg,
+		Config:     cfg,
 		HTTPClient: newHttpClient(cfg),
 	}
 
@@ -77,9 +78,9 @@ func NewSession(cfgs ...*checkpoint.Config) (*Session, error) {
 
 func newHttpClient(c *checkpoint.Config) *sling.Sling {
 	u := &url.URL{
-		Host: fmt.Sprintf("%s:%d", c.ApiHost, c.ApiPort),
-		Scheme: fmt.Sprintf("%s", c.ApiScheme),
-		Path: fmt.Sprintf("%s/%s", c.ApiContext, c.ApiVersion),
+		Host:   fmt.Sprintf("%s:%d", checkpoint.StringValue(c.ApiHost), checkpoint.IntValue(c.ApiPort)),
+		Scheme: fmt.Sprintf("%s", checkpoint.StringValue(c.ApiScheme)),
+		Path:   fmt.Sprintf("%s/%s", checkpoint.StringValue(c.ApiContext), checkpoint.StringValue(c.ApiVersion)),
 	}
 
 	return sling.New().
@@ -87,6 +88,7 @@ func newHttpClient(c *checkpoint.Config) *sling.Sling {
 		Base(u.String()).
 		Set("Content-Type", "application/json")
 }
+
 // Must is a helper function to ensure the Session is valid and there was no
 // error when calling a NewSession function.
 //
@@ -236,8 +238,40 @@ func (c credProviderError) IsExpired() bool {
 //     sess.Copy(&aws.Config{Region: aws.String("us-west-2")})
 func (s *Session) Copy(cfgs ...*checkpoint.Config) *Session {
 	newSession := &Session{
-		Config:   s.Config.Copy(cfgs...),
+		Config: s.Config.Copy(cfgs...),
 	}
 
 	return newSession
+}
+
+func (s *Session) Send(r *Request, out, err interface{}) error {
+	httpClient := s.HTTPClient.New()
+	httpClient.BodyJSON(r.RequestBody)
+
+	switch r.HTTPMethod {
+	case "HEAD":
+		httpClient.Head(r.HTTPPath)
+	case "GET":
+		httpClient.Get(r.HTTPPath)
+	case "POST":
+		httpClient.Post(r.HTTPPath)
+	case "PUT":
+		httpClient.Put(r.HTTPPath)
+	case "PATCH":
+		httpClient.Path(r.HTTPPath)
+	case "DELETE":
+		httpClient.Delete(r.HTTPPath)
+	case "OPTIONS":
+		httpClient.Options(r.HTTPPath)
+	case "TRACE":
+		httpClient.Trace(r.HTTPPath)
+	case "CONNECT":
+		httpClient.Connect(r.HTTPPath)
+	default:
+		return errors.New(fmt.Sprintf("Unknown operation '%s'", r.HTTPMethod))
+	}
+
+	_, e := httpClient.Receive(out, err)
+
+	return e
 }

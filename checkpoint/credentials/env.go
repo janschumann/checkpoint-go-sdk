@@ -11,7 +11,7 @@ import (
 const EnvProviderName = "EnvProvider"
 
 var (
-	ErrEnvUserNotFound = checkpointerror.New("EnvUserNotFound", "CHECKPOINT_USER not found in environment", nil)
+	ErrEnvUserNotFound     = checkpointerror.New("EnvUserNotFound", "CHECKPOINT_USER not found in environment", nil)
 	ErrEnvPasswordNotFound = checkpointerror.New("EnvPasswordNotFound", "CHECKPOINT_PASSWORD not found in environment", nil)
 )
 
@@ -46,9 +46,9 @@ func (e *EnvProvider) Retrieve() (Value, error) {
 
 	e.retrieved = true
 	return Value{
-		User:     user,
-		Password: password,
-		ProviderName:    EnvProviderName,
+		User:         user,
+		Password:     password,
+		ProviderName: EnvProviderName,
 	}, nil
 }
 

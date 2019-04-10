@@ -4,7 +4,7 @@ package credentials
 
 import "sync"
 
-var AnonymousCredentials = NewStaticCredentials("", "", "")
+var AnonymousCredentials = NewStaticCredentials("", "")
 
 // Credentials set by provider
 type Value struct {
@@ -14,10 +14,6 @@ type Value struct {
 	// api password
 	Password string
 
-	// api Session Token
-	SessionToken string
-
-	// Provider used to get credentials
 	ProviderName string
 }
 
@@ -131,4 +127,3 @@ func (c *Credentials) Get() (Value, error) {
 
 	return c.creds, nil
 }
-
