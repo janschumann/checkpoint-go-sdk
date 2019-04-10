@@ -1,3 +1,5 @@
+// borrowed from aws-sdk-go
+
 package checkpointerror
 
 import "fmt"
