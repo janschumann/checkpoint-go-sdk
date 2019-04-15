@@ -79,10 +79,10 @@ func (c *Config) WithCredentials(creds *credentials.Credentials) *Config {
 	return c
 }
 
-// WithDisableSSL sets a config DisableSSL value returning a Config pointer
+// WithInsecure sets a config DisableSSL value returning a Config pointer
 // for chaining.
-func (c *Config) WithDisableSSL(disable bool) *Config {
-	c.DisableSSL = &disable
+func (c *Config) WithInsecure(insecure bool) *Config {
+	c.DisableSSL = &insecure
 	return c
 }
 

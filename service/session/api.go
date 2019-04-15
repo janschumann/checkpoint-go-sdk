@@ -1,39 +1,86 @@
 package session
 
-import (
-	"github.com/janschumann/checkpoint-go-sdk/checkpoint/client"
-)
-
 type PublishInput struct{}
 
 type PublishOutput struct {
 	TaskId string `json:"task-id"`
 }
 
-type PublishError struct {
+type ShowSessionsInput struct {
+	Offset                int  `json:"offset"`
+	Limit                 int  `json:"limit"`
+	ViewPublishedSessions bool `json:"view-published-sessions"`
+}
+
+type ShowObjectsInput struct {
+	Offset int `json:"offset"`
+	Limit  int `json:"limit"`
+}
+
+type SessionOutput struct {
+	Name string `json:"name"`
+	Uid  string `json:"uid"`
+	Type string `json:"type"`
+}
+
+type ShowSessionsOutput struct {
+	From    int `json:"from"`
+	Objects *[]SessionOutput
+	To      int `json:"to"`
+	Total   int `json:"total"`
+}
+
+type ShowObjectsOutput struct {
+	From    int `json:"from"`
+	Objects *[]SessionOutput
+	To      int `json:"to"`
+	Total   int `json:"total"`
+}
+
+type DisconnectInput struct {
+	Uid     string `json:"uid"`
+	Discard bool   `json:"discard"`
+}
+
+type DisconnectOutput struct {
 	Message string `json:"message"`
-	Code    string `json:"code"`
 }
 
-func (c *SessionService) PublishRequest(input *PublishInput) (*client.Request, *PublishOutput, *PublishError) {
-	if input == nil {
-		input = &PublishInput{}
-	}
+func (c *SessionService) Publish() (*PublishOutput, error) {
+	input := &PublishInput{}
+	out := &PublishOutput{}
+	req := c.NewPostRequest("publish", input)
 
-	op := &client.Request{
-		HTTPMethod:  "POST",
-		HTTPPath:    "publish",
-		RequestBody: input,
-	}
-
-	successOut := &PublishOutput{}
-	errorOut := &PublishError{}
-
-	return op, successOut, errorOut
+	return out, c.Client.Send(req, out)
 }
 
-func (c *SessionService) Publish() (*PublishOutput, *PublishError, error) {
-	op, successOut, errorOut := c.PublishRequest(nil)
-	err := c.Client.Send(op, successOut, errorOut)
-	return successOut, errorOut, err
+func (c *SessionService) ShowSessions() (*ShowSessionsOutput, error) {
+	//@todo implement paging
+	input := &ShowSessionsInput{
+		Limit:                 500,
+		Offset:                0,
+		ViewPublishedSessions: true,
+	}
+	out := &ShowSessionsOutput{}
+	req := c.NewPostRequest("show-sessions", input)
+
+	return out, c.Client.Send(req, out)
+}
+
+func (c *SessionService) ShowObjects() (*ShowObjectsOutput, error) {
+	input := &ShowObjectsInput{
+		Limit:  500,
+		Offset: 0,
+	}
+	out := &ShowObjectsOutput{}
+	req := c.NewPostRequest("show-objects", input)
+
+	return out, c.Client.Send(req, out)
+}
+
+func (c *SessionService) Disconnect(input *DisconnectInput) (*DisconnectOutput, error) {
+	out := &DisconnectOutput{}
+	req := c.NewPostRequest("disconnect", input)
+
+	return out, c.Client.Send(req, out)
 }

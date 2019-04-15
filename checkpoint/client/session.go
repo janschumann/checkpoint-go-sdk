@@ -230,48 +230,42 @@ func (c credProviderError) IsExpired() bool {
 	return true
 }
 
-// Copy creates and returns a copy of the current Session, coping the config
-// and handlers. If any additional configs are provided they will be merged
-// on top of the Session's copied config.
-//
-//     // Create a copy of the current Session, configured for the us-west-2 region.
-//     sess.Copy(&aws.Config{Region: aws.String("us-west-2")})
-func (s *Session) Copy(cfgs ...*checkpoint.Config) *Session {
-	newSession := &Session{
-		Config: s.Config.Copy(cfgs...),
-	}
-
-	return newSession
-}
-
-func (s *Session) Send(r *Request, out, err interface{}) error {
+func (s *Session) Send(req *Request, successOutput interface{}) error {
 	httpClient := s.HTTPClient.New()
-	httpClient.BodyJSON(r.RequestBody)
+	httpClient.BodyJSON(req.Body)
+	path := fmt.Sprintf("%s/%s", checkpoint.StringValue(s.Config.ApiVersion), req.HTTPPath)
 
-	switch r.HTTPMethod {
+	switch req.HTTPMethod {
 	case "HEAD":
-		httpClient.Head(r.HTTPPath)
+		httpClient.Head(path)
 	case "GET":
-		httpClient.Get(r.HTTPPath)
+		httpClient.Get(path)
 	case "POST":
-		httpClient.Post(r.HTTPPath)
+		httpClient.Post(path)
 	case "PUT":
-		httpClient.Put(r.HTTPPath)
+		httpClient.Put(path)
 	case "PATCH":
-		httpClient.Path(r.HTTPPath)
+		httpClient.Path(path)
 	case "DELETE":
-		httpClient.Delete(r.HTTPPath)
+		httpClient.Delete(path)
 	case "OPTIONS":
-		httpClient.Options(r.HTTPPath)
+		httpClient.Options(path)
 	case "TRACE":
-		httpClient.Trace(r.HTTPPath)
+		httpClient.Trace(path)
 	case "CONNECT":
-		httpClient.Connect(r.HTTPPath)
+		httpClient.Connect(path)
 	default:
-		return errors.New(fmt.Sprintf("Unknown operation '%s'", r.HTTPMethod))
+		return errors.New(fmt.Sprintf("Unknown operation '%s'", req.HTTPMethod))
 	}
 
-	_, e := httpClient.Receive(out, err)
+	errorOutput := &Error{}
 
-	return e
+	// @todo implement a ResponseError object which allows to set the original httpresponse
+	_, err := httpClient.Receive(successOutput, errorOutput)
+
+	if err != nil || errorOutput.Code != "" {
+		return checkpointerror.New(errorOutput.Code, errorOutput.Message, err)
+	}
+
+	return nil
 }

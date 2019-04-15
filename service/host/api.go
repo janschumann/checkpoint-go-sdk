@@ -1,9 +1,5 @@
 package host
 
-import (
-	"github.com/janschumann/checkpoint-go-sdk/checkpoint/client"
-)
-
 type AddHostInput struct {
 	Name       string `json:"name"`
 	IpAddress  string `json:"ip-address,omitempty"`
@@ -11,44 +7,64 @@ type AddHostInput struct {
 	Ip6Address string `json:"ipv6-address,omitempty"`
 }
 
-type AddHostOutput struct {
+type HostData struct {
 	Name       string `json:"name"`
 	Uid        string `json:"uid"`
-	Ip4Address string `json:"ipv4-address"`
-	Ip6Address string `json:"ipv6-address"`
+	Ip4Address string `json:"ipv4-address,omitempty"`
+	Ip6Address string `json:"ipv6-address,omitempty"`
 }
 
-type ValidationMessage struct {
-	IsCurrentSession int    `json:"current-session"`
-	Message          string `json:"message"`
-}
-type AddHostError struct {
-	Message        string `json:"message"`
-	Code           string `json:"code"`
-	Warnings       *[]ValidationMessage
-	Errors         *[]ValidationMessage
-	BlockingErrors *[]ValidationMessage
+type HostsOutput struct {
+	From    int         `json:"from"`
+	Objects *[]HostData `json:"objects"`
+	To      int         `json:"to"`
+	Total   int         `json:"total"`
 }
 
-func (c *HostService) AddHost(input *AddHostInput) (*AddHostOutput, *AddHostError, error) {
-	op, successOut, errorOut := c.AddHostRequest(input)
-	err := c.Client.Send(op, successOut, errorOut)
-	return successOut, errorOut, err
+type ShowHostInput struct {
+	Uid string `json:"uid"`
 }
 
-func (c *HostService) AddHostRequest(input *AddHostInput) (req *client.Request, output *AddHostOutput, error *AddHostError) {
-	if input == nil {
-		input = &AddHostInput{}
+type ShowHostsInput struct {
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
+}
+
+type DeleteHostOutput struct {
+	Message string `json:"message"`
+}
+
+func (c *HostService) AddHost(input *AddHostInput) (*HostData, error) {
+	out := &HostData{}
+	req := c.NewPostRequest("add-host", input)
+
+	return out, c.Client.Send(req, out)
+}
+
+func (c *HostService) ShowHost(input *ShowHostInput) (*HostData, error) {
+	out := &HostData{}
+	req := c.NewPostRequest("show-host", input)
+
+	return out, c.Client.Send(req, out)
+}
+
+func (c *HostService) ShowHosts() (*HostsOutput, error) {
+	out := &HostsOutput{}
+
+	//@todo implement paging
+	input := &ShowHostsInput{
+		Limit:  500,
+		Offset: 0,
 	}
 
-	op := &client.Request{
-		HTTPMethod:  "POST",
-		HTTPPath:    "add-host",
-		RequestBody: input,
-	}
+	req := c.NewPostRequest("show-hosts", input)
 
-	output = &AddHostOutput{}
-	error = &AddHostError{}
+	return out, c.Client.Send(req, out)
+}
 
-	return op, output, error
+func (c *HostService) DeleteHost(input *ShowHostInput) (*DeleteHostOutput, error) {
+	out := &DeleteHostOutput{}
+	req := c.NewPostRequest("delete-host", input)
+
+	return out, c.Client.Send(req, out)
 }
