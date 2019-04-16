@@ -126,4 +126,8 @@ func mergeInConfig(dst *Config, other *Config) {
 	if other.SessionName != nil {
 		dst.SessionName = other.SessionName
 	}
+
+	if other.Insecure != nil {
+		dst.Insecure = other.Insecure
+	}
 }

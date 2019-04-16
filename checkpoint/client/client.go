@@ -23,6 +23,14 @@ func New(cfgs ...*checkpoint.Config) (*Client, error) {
 	return &Client{httpClient: http.NewClient(cfg)}, nil
 }
 
+func Must(c *Client, err error) *Client {
+	if err != nil {
+		panic(err)
+	}
+
+	return c
+}
+
 func (c *Client) Send(req *request.Request, res interface{}) error {
 	err := c.EnsureSession()
 	if err != nil {
@@ -35,8 +43,8 @@ func (c *Client) Send(req *request.Request, res interface{}) error {
 type LoginInput struct {
 	User                string `json:"user"`
 	Password            string `json:"password"`
-	SessionName         string `json:"httpClient-name"`
-	ContinueLastSession bool   `json:"continue-last-httpClient"`
+	SessionName         string `json:"session-name"`
+	ContinueLastSession bool   `json:"continue-last-session"`
 }
 
 type LastLoginResponse struct {
@@ -48,7 +56,7 @@ type LoginResponse struct {
 	Uid       string             `json:"uid"`
 	Sid       string             `json:"sid"`
 	Url       string             `json:"url"`
-	ExpiresIn int64              `json:"httpClient-timeout"`
+	ExpiresIn int64              `json:"session-timeout"`
 	LastLogin *LastLoginResponse `json:"last-login-was-at"`
 	Version   string             `json:"api-server-version"`
 }

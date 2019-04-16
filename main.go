@@ -10,11 +10,11 @@ import (
 
 func main() {
 
-	c := client.New(checkpoint.NewConfig().
+	c := client.Must(client.New(checkpoint.NewConfig().
 		WithCredentials(credentials.NewStaticCredentials("admin", "dkPL.N5zqAJKad7yFoZAN(Pm")).
 		WithApiHost("management-wbo7vw5btkaac.westeurope.cloudapp.azure.com").
 		WithInsecure(true).
-		WithSessionName("JanSchumann"))
+		WithSessionName("JanSchumann")))
 
 	h := host.New(c)
 	//hr, err := h.AddHost(&host.AddHostInput{
