@@ -1,5 +1,5 @@
-SOURCE_FILE := $(shell find . -name "*.go" -type f)
+GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 
 fmt:
-	$(foreach var,$(SOURCE_FILE),$(shell go fmt $(var)))
+	gofmt -l -w $(GOFMT_FILES)
 

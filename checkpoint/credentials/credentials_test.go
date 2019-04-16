@@ -1,9 +1,9 @@
 package credentials
 
 import (
+	"github.com/janschumann/checkpoint-go-sdk/checkpoint/checkpointerror"
 	"testing"
 	"time"
-	"github.com/janschumann/checkpoint-go-sdk/checkpoint/checkpointerror"
 )
 
 type stubProvider struct {
