@@ -1,3 +1,5 @@
+// borrowed from aws-sdk-go
+
 package checkpoint
 
 // String returns a pointer to the string value passed in.

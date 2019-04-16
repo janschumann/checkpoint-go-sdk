@@ -52,7 +52,7 @@ func (e *EnvProvider) Retrieve() (Value, error) {
 	}, nil
 }
 
-// IsExpired returns if the credentials have been retrieved.
+// IsExpired returns false if the credentials have been retrieved.
 func (e *EnvProvider) IsExpired() bool {
 	return !e.retrieved
 }

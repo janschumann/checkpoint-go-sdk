@@ -10,6 +10,7 @@ const defaultScheme = "https"
 const defaultPort = 443
 const defaultApiPath = "web_api"
 const defaultApiVersion = "1.3"
+const defaultSessionName = ""
 
 // Config returns the default configuration without credentials.
 // To retrieve a config with credentials also included use
@@ -25,5 +26,6 @@ func Config() *checkpoint.Config {
 		WithApiScheme(defaultScheme).
 		WithApiPort(defaultPort).
 		WithApiContext(defaultApiPath).
-		WithApiVersion(defaultApiVersion)
+		WithApiVersion(defaultApiVersion).
+		WithSessionName(defaultSessionName)
 }

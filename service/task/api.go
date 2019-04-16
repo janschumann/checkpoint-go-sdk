@@ -1,5 +1,7 @@
 package task
 
+import "github.com/janschumann/checkpoint-go-sdk/checkpoint/client/request"
+
 type ShowTasksInput struct {
 	Offset int `json:"offset"`
 	Limit  int `json:"limit"`
@@ -27,7 +29,7 @@ func (c *TaskService) ShowTasks() (*ShowTasksOutput, error) {
 		Offset: 0,
 	}
 	out := &ShowTasksOutput{}
-	req := c.NewPostRequest("show-tasks", input)
+	req := request.NewPostRequest("show-tasks", input)
 
 	return out, c.Client.Send(req, out)
 }

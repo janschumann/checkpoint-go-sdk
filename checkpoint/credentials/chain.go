@@ -6,13 +6,6 @@ import (
 	"github.com/janschumann/checkpoint-go-sdk/checkpoint/checkpointerror"
 )
 
-var (
-	ErrNoValidProvidersFoundInChain = checkpointerror.New("NoCredentialProviders",
-		`no valid providers in chain. Deprecated.
-	For verbose messaging see aws.Config.CredentialsChainVerboseErrors`,
-		nil)
-)
-
 // A ChainProvider will search for a provider which returns credentials
 // and cache that provider until Retrieve is called again.
 //
@@ -27,9 +20,8 @@ var (
 // will cache that Provider for all calls to IsExpired(), until Retrieve is
 // called again.
 type ChainProvider struct {
-	Providers     []Provider
-	curr          Provider
-	VerboseErrors bool
+	Providers []Provider
+	curr      Provider
 }
 
 // NewChainCredentials returns a pointer to a new Credentials object
@@ -57,12 +49,8 @@ func (c *ChainProvider) Retrieve() (Value, error) {
 	}
 	c.curr = nil
 
-	var err error
-	err = ErrNoValidProvidersFoundInChain
-	if c.VerboseErrors {
-		err = checkpointerror.NewBatchError("NoCredentialProviders", "no valid providers in chain", errs)
-	}
-	return Value{}, err
+	return Value{}, checkpointerror.NewBatchError("NoCredentialProviders",
+		"no valid providers in chain", errs)
 }
 
 // IsExpired will returned the expired state of the currently cached provider

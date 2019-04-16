@@ -4,22 +4,16 @@ package credentials
 
 import "github.com/janschumann/checkpoint-go-sdk/checkpoint/checkpointerror"
 
-// StaticProviderName provides a name of Static provider
 const StaticProviderName = "StaticProvider"
 
 var (
-	// ErrStaticCredentialsEmpty is emitted when static credentials are empty.
 	ErrStaticCredentialsEmpty = checkpointerror.New("EmptyStaticCreds", "static credentials are empty", nil)
 )
 
-// A StaticProvider is a set of credentials which are set programmatically,
-// and will never expire.
 type StaticProvider struct {
 	Value
 }
 
-// NewStaticCredentials returns a pointer to a new Credentials object
-// wrapping a static credentials value provider.
 func NewStaticCredentials(user, password string) *Credentials {
 	return NewCredentials(&StaticProvider{Value: Value{
 		User:     user,
@@ -27,14 +21,10 @@ func NewStaticCredentials(user, password string) *Credentials {
 	}})
 }
 
-// NewStaticCredentialsFromCreds returns a pointer to a new Credentials object
-// wrapping the static credentials value provide. Same as NewStaticCredentials
-// but takes the creds Value instead of individual fields
 func NewStaticCredentialsFromCreds(creds Value) *Credentials {
 	return NewCredentials(&StaticProvider{Value: creds})
 }
 
-// Retrieve returns the credentials or error if the credentials are invalid.
 func (s *StaticProvider) Retrieve() (Value, error) {
 	if s.User == "" || s.Password == "" {
 		return Value{ProviderName: StaticProviderName}, ErrStaticCredentialsEmpty
@@ -46,9 +36,7 @@ func (s *StaticProvider) Retrieve() (Value, error) {
 	return s.Value, nil
 }
 
-// IsExpired returns if the credentials are expired.
-//
-// For StaticProvider, the credentials never expired.
+// For StaticProvider, the credentials never expire.
 func (s *StaticProvider) IsExpired() bool {
 	return false
 }
