@@ -23,3 +23,5 @@ vet:
 fmt:
 	gofmt -w $(GOFMT_FILES)
 
+gen-swagger:
+	go generate ./api

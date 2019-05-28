@@ -13,6 +13,16 @@ This is in a very early development stage. There are still some core decisions t
 currently thinking about generating the API components via the 
 [checkpoint API definition](https://sc1.checkpoint.com/documents/latest/APIs/data/v1.5/dynamic/apis.json)
 
+## Convert api model to swagger
+
+This will convert Checkpoint´s API specification to an Open API compliant JSON:
+
+```sh
+make gen-swagger
+```
+
+Currently version 1.1-1.5 are generated.
+
 ## Getting started
 
 The best way to get started working with the SDK is to use `go get` to add the SDK to your Go Workspace
