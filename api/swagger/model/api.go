@@ -8,11 +8,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Unmarshal(b bytes.Buffer) (error, *Api) {
+func UnmarshalApi(b bytes.Buffer) (*Api, error) {
 	var model Model
 	err := json.Unmarshal(b.Bytes(), &model)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
 	api := &Api{
@@ -30,7 +30,7 @@ func Unmarshal(b bytes.Buffer) (error, *Api) {
 		api.Definitions[d.Name] = d
 	}
 
-	return nil, api
+	return api, err
 }
 
 type Api struct {
@@ -40,8 +40,10 @@ type Api struct {
 	Definitions map[string]Definition
 }
 
-func (a *Api) Convert() *spec.Swagger {
-	c := &converter{}
+func (a *Api) Convert(tags *Tags) *spec.Swagger {
+	c := &converter{
+		tags: tags,
+	}
 	return c.consume(a)
 }
 
